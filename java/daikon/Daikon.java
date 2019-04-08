@@ -37,6 +37,7 @@ import daikon.inv.binary.twoScalar.LinearBinary;
 import daikon.inv.binary.twoScalar.LinearBinaryFloat;
 import daikon.inv.binary.twoScalar.NumericFloat;
 import daikon.inv.binary.twoScalar.NumericInt;
+import daikon.inv.binary.twoScalar.PositionSpacing;
 import daikon.inv.binary.twoSequence.PairwiseFloatEqual;
 import daikon.inv.binary.twoSequence.PairwiseFloatGreaterEqual;
 import daikon.inv.binary.twoSequence.PairwiseFloatGreaterThan;
@@ -86,7 +87,6 @@ import daikon.inv.binary.twoString.StdString;
 import daikon.inv.binary.twoString.StringEqual;
 import daikon.inv.binary.twoString.StringGreaterEqual;
 import daikon.inv.binary.twoString.StringGreaterThan;
-import daikon.inv.binary.twoString.StringLessEqual;
 import daikon.inv.binary.twoString.StringLessThan;
 import daikon.inv.binary.twoString.StringNonEqual;
 import daikon.inv.ternary.threeScalar.FunctionBinary;
@@ -103,6 +103,7 @@ import daikon.inv.unary.scalar.NonZero;
 import daikon.inv.unary.scalar.NonZeroFloat;
 import daikon.inv.unary.scalar.OneOfFloat;
 import daikon.inv.unary.scalar.OneOfScalar;
+import daikon.inv.unary.scalar.Positive;
 import daikon.inv.unary.scalar.RangeFloat;
 import daikon.inv.unary.scalar.RangeInt;
 import daikon.inv.unary.scalar.UpperBound;
@@ -1469,7 +1470,8 @@ public final class Daikon {
 
       // Positive (x > 0) (Postive.java).  Positive is a sample invariant
       // that is only included as an example.
-      // proto_invs.add (Postive.get_proto());
+      proto_invs.add(Positive.get_proto());
+      // proto_invs.add(Negative.get_proto());
     }
 
     // Unary sequence invariants
@@ -1553,7 +1555,6 @@ public final class Daikon {
       proto_invs.add(StringNonEqual.get_proto());
       proto_invs.add(StringLessThan.get_proto());
       proto_invs.add(StringGreaterThan.get_proto());
-      proto_invs.add(StringLessEqual.get_proto());
       proto_invs.add(StringGreaterEqual.get_proto());
 
       // LinearBinary over integer/float (from LinearBinary.java.jpp)
@@ -1566,6 +1567,9 @@ public final class Daikon {
 
       // Standard binary string invariants
       proto_invs.addAll(StdString.get_proto_all());
+
+      // PositionSpacing constraint
+      proto_invs.add(PositionSpacing.get_proto());
     }
 
     // Binary sequence-sequence invariants
