@@ -1,4 +1,4 @@
-package daikon.inv.binary.twoScalar;
+package daikon.inv.binary;
 
 import daikon.*;
 import daikon.derive.binary.*;
@@ -30,7 +30,34 @@ import typequals.prototype.qual.Prototype;
 //	- do rest of Auto Layout constraints
 
 /** Represents an invariant of - between two long scalars. Prints as {@code x = y + a}. */
-public final class PositionSpacing extends TwoScalar implements EqualityComparison {
+public final class PositionSpacing extends BinaryInvariant implements EqualityComparison {
+
+   public InvariantStatus check_unmodified(long v1, long v2, int count) {
+    return InvariantStatus.NO_CHANGE;
+   }
+
+   // if true, swap the order of the invariant variables
+   protected boolean swap = false;
+   /**
+   * Returns whether or not the invariant is valid over the basic types in vis. This only checks
+   * basic types (scalar, string, array, etc) and should match the basic superclasses of invariant
+   * (SingleFloat, SingleScalarSequence, ThreeScalar, etc). More complex checks that depend on
+   * variable details can be implemented in instantiate_ok().
+   *
+   * @see #instantiate_ok(VarInfo[])
+   */
+   @Override public boolean valid_types(@Prototype PositionSpacing this, VarInfo[] vis){
+   return true; 
+   }
+   
+   @Override public String format_using(@GuardSatisfied PositionSpacing this, OutputFormat format) {
+   return "String"; 
+   }
+
+  @Override
+  protected Invariant resurrect_done(int[] permutation) {
+    throw new UnsupportedOperationException();
+  }
 
   // We are Serializable, so we specify a version to allow changes to
   // method signatures without breaking serialization.  If you add or
@@ -64,9 +91,9 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     return dkconfig_enabled;
   }
 
+ 
   /** Returns whether or not the specified var types are valid for PositionSpacing */
-  @Override
-  public boolean instantiate_ok(VarInfo[] vis) {
+ /* @Override public boolean instantiate_ok(VarInfo[] vis) {
     // @TODO: check dec types s.t. they are valid for PositionSpacing constraints
     //	- position attributes.... go get the formal defintiion
     if (!valid_types(vis)) {
@@ -74,7 +101,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     }
 
     return true;
-  }
+  }*/
 
   /** Instantiate an invariant on the specified slice. */
   @Override
@@ -89,8 +116,8 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     // sign
     return true;
   }
-
-  @Override
+  
+  // removed @Override annotation 
   protected Invariant resurrect_done_swapped() {
     // @TODO: we don't have symmetry, so we do care when things swap.
     // 	find an example of swapping in another Invariant. Also read what swapping and symmetry
@@ -99,7 +126,54 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     // we don't care if things swap; we have symmetry
     return this;
   }
+/**
+   * Returns the first variable. This is the only mechanism by which subclasses should access
+   * variables.
+   */
+  public VarInfo var1(@GuardSatisfied PositionSpacing this) {
+    if (swap) {
+      return ppt.var_infos[1];
+    } else {
+      return ppt.var_infos[0];
+    }
+  }
 
+  /**
+   * Returns the first variable. This is the only mechanism by which subclasses should access
+   * variables.
+   */
+  public VarInfo var2(@GuardSatisfied PositionSpacing this) {
+    if (swap) {
+      return ppt.var_infos[0];
+    } else {
+      return ppt.var_infos[1];
+    }
+  }
+
+  @Override
+  public InvariantStatus check(
+      @Interned Object val1, @Interned Object val2, int mod_index, int count) {
+    // Tests for whether a value is missing should be performed before
+    // making this call, so as to reduce overall work.
+    assert ! falsified;
+    assert (mod_index >= 0) && (mod_index < 4);
+    long v1 = (((Long) val1).longValue());
+    long v2 = (((Long) val2).longValue());
+    if (mod_index == 0) {
+      if (swap) {
+        return check_unmodified(v2, v1, count);
+      } else {
+        return check_unmodified(v1, v2, count);
+      }
+    } else {
+      if (swap) {
+        return check_modified(v2, v1, count);
+      } else {
+        return check_modified(v1, v2, count);
+      }
+    }
+  } 
+   
   @Pure
   @Override
   public boolean is_symmetric() {
@@ -135,11 +209,10 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     return "PositionSpacing" + varNames();
   }
 
-  @SideEffectFree
+  /*@SideEffectFree
   @Override
   public String format_using(@GuardSatisfied PositionSpacing this, OutputFormat format) {
     // @TODO: update to actually represent PositionSpacing constraint i.e. x = y + a
-
     String var1name = var1().name_using(format);
     String var2name = var2().name_using(format);
 
@@ -181,9 +254,9 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     }
 
     return format_unimplemented(format);
-  }
+  }*/
 
-  @Override
+ //@Override
   public InvariantStatus check_modified(long v1, long v2, int count) {
     // @TODO: implement a check that actually makes sense. TBH, since our "variables" are constants,
     //    this could probably be return NO_CHANGE all the time, but think about it harder first.
@@ -193,7 +266,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     return InvariantStatus.NO_CHANGE;
   }
 
-  @Override
+  //@Override
   public InvariantStatus add_modified(long v1, long v2, int count) {
     if (logDetail() || debug.isLoggable(Level.FINE)) {
       log(
@@ -207,6 +280,10 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     return check_modified(v1, v2, count);
   }
 
+  /** By default, do nothing if the value hasn't been seen yet. Subclasses can override this. */
+  public InvariantStatus add_unmodified(long v1, long v2, int count) {
+    return InvariantStatus.NO_CHANGE;
+  }
   // This is very tricky, because whether two variables are equal should
   // presumably be transitive, but it's not guaranteed to be so when using
   // this method and not dropping out all variables whose values are ever
@@ -261,7 +338,30 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
   //   super.destroy();
   // }
 
-  @Override
+ @Override
+  public InvariantStatus add(
+      @Interned Object val1, @Interned Object val2, int mod_index, int count) {
+    // Tests for whether a value is missing should be performed before
+    // making this call, so as to reduce overall work.
+    assert ! falsified;
+    assert (mod_index >= 0) && (mod_index < 4);
+    long v1 = (((Long) val1).longValue());
+    long v2 = (((Long) val2).longValue());
+    if (mod_index == 0) {
+      if (swap) {
+        return add_unmodified(v2, v1, count);
+      } else {
+        return add_unmodified(v1, v2, count);
+      }
+    } else {
+      if (swap) {
+        return add_modified(v2, v1, count);
+      } else {
+        return add_modified(v1, v2, count);
+      }
+    }
+  }
+ /* @Override
   public InvariantStatus add(@Interned Object v1, @Interned Object v2, int mod_index, int count) {
     // @TODO: check out logging for Invariants with computed constants to see how they're logged
     if (debug.isLoggable(Level.FINE)) {
@@ -279,7 +379,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
               + ")");
     }
     return super.add(v1, v2, mod_index, count);
-  }
+  }*/
 
   @Pure
   @Override
@@ -287,7 +387,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     return true;
   }
 
-  @Pure
+  /*@Pure
   @Override
   public boolean isExclusiveFormula(Invariant other) {
 
@@ -300,7 +400,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     }
 
     return false;
-  }
+  }*/
 
   @Override
   public @Nullable DiscardInfo isObviousStatically(VarInfo[] vis) {
@@ -334,7 +434,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
    * avoid circular isObvious relations. We only check if this.ppt.var_infos imply obviousness
    * rather than the cartesian product on the equality set.
    */
-  @Pure
+ /* @Pure
   @Override
   public @Nullable DiscardInfo isObviousStatically_SomeInEquality() {
     if (var1().equalitySet == var2().equalitySet) {
@@ -342,14 +442,14 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     } else {
       return super.isObviousStatically_SomeInEquality();
     }
-  }
+  }*/
 
   /**
    * Since this invariant can be a postProcessed equality, we have to handle isObvious especially to
    * avoid circular isObvious relations. We only check if this.ppt.var_infos imply obviousness
    * rather than the cartesian product on the equality set.
    */
-  @Pure
+  /*@Pure
   @Override
   public @Nullable DiscardInfo isObviousDynamically_SomeInEquality() {
     if (var1().equalitySet == var2().equalitySet) {
@@ -357,7 +457,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     } else {
       return super.isObviousDynamically_SomeInEquality();
     }
-  }
+  }*/
 
   @Pure
   @Override
@@ -392,10 +492,10 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     }
 
     // Check for size(A[]) == Size(B[]) where A[] == B[]
-    di = array_eq_implies(vis);
+    /*di = array_eq_implies(vis);
     if (di != null) {
       return di;
-    }
+    }*/
 
     { // Sequence length tests
       SequenceLength sl1 = null;
@@ -469,7 +569,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
    *
    * <pre>(x[] = y[]) &rArr; size(x[]) = size(y[])</pre>
    */
-  private @Nullable DiscardInfo array_eq_implies(VarInfo[] vis) {
+  /*private @Nullable DiscardInfo array_eq_implies(VarInfo[] vis) {
 
     // Make sure v1 and v2 are size(array) with the same shift
     VarInfo v1 = vis[0];
@@ -505,7 +605,7 @@ public final class PositionSpacing extends TwoScalar implements EqualityComparis
     }
 
     return null;
-  }
+  }*/
 
   /** NI suppressions, initialized in get_ni_suppressions() */
   private static @Nullable NISuppressionSet suppressions = null;

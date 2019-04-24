@@ -37,7 +37,7 @@ import daikon.inv.binary.twoScalar.LinearBinary;
 import daikon.inv.binary.twoScalar.LinearBinaryFloat;
 import daikon.inv.binary.twoScalar.NumericFloat;
 import daikon.inv.binary.twoScalar.NumericInt;
-import daikon.inv.binary.twoScalar.PositionSpacing;
+import daikon.inv.binary.PositionSpacing;
 import daikon.inv.binary.twoSequence.PairwiseFloatEqual;
 import daikon.inv.binary.twoSequence.PairwiseFloatGreaterEqual;
 import daikon.inv.binary.twoSequence.PairwiseFloatGreaterThan;
