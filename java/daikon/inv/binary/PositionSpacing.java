@@ -17,7 +17,6 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.qual.Pure;
-import org.checkerframework.dataflow.qual.SideEffectFree;
 import typequals.prototype.qual.Prototype;
 
 // @TODO:
@@ -32,13 +31,13 @@ import typequals.prototype.qual.Prototype;
 /** Represents an invariant of - between two long scalars. Prints as {@code x = y + a}. */
 public final class PositionSpacing extends BinaryInvariant implements EqualityComparison {
 
-   public InvariantStatus check_unmodified(long v1, long v2, int count) {
+  public InvariantStatus check_unmodified(long v1, long v2, int count) {
     return InvariantStatus.NO_CHANGE;
-   }
+  }
 
-   // if true, swap the order of the invariant variables
-   protected boolean swap = false;
-   /**
+  // if true, swap the order of the invariant variables
+  protected boolean swap = false;
+  /**
    * Returns whether or not the invariant is valid over the basic types in vis. This only checks
    * basic types (scalar, string, array, etc) and should match the basic superclasses of invariant
    * (SingleFloat, SingleScalarSequence, ThreeScalar, etc). More complex checks that depend on
@@ -46,13 +45,23 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
    *
    * @see #instantiate_ok(VarInfo[])
    */
-   @Override public boolean valid_types(@Prototype PositionSpacing this, VarInfo[] vis){
-   return true; 
-   }
-   
-   @Override public String format_using(@GuardSatisfied PositionSpacing this, OutputFormat format) {
-   return "String"; 
-   }
+  /** Returns whether or not the specified types are valid. */
+  @Override
+  final public boolean valid_types(VarInfo[] vis) {
+  
+      if (vis.length != 2) {
+        return false;
+      }
+  
+      boolean dim_ok = !vis[0].file_rep_type.isArray() && !vis[1].file_rep_type.isArray();
+  
+      return (dim_ok && vis[0].file_rep_type.baseIsScalar() && vis[1].file_rep_type.baseIsScalar());
+  }
+
+  @Override
+  public String format_using(@GuardSatisfied PositionSpacing this, OutputFormat format) {
+    return "String";
+  }
 
   @Override
   protected Invariant resurrect_done(int[] permutation) {
@@ -91,9 +100,8 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
     return dkconfig_enabled;
   }
 
- 
   /** Returns whether or not the specified var types are valid for PositionSpacing */
- /* @Override public boolean instantiate_ok(VarInfo[] vis) {
+  /* @Override public boolean instantiate_ok(VarInfo[] vis) {
     // @TODO: check dec types s.t. they are valid for PositionSpacing constraints
     //	- position attributes.... go get the formal defintiion
     if (!valid_types(vis)) {
@@ -116,8 +124,8 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
     // sign
     return true;
   }
-  
-  // removed @Override annotation 
+
+  // removed @Override annotation
   protected Invariant resurrect_done_swapped() {
     // @TODO: we don't have symmetry, so we do care when things swap.
     // 	find an example of swapping in another Invariant. Also read what swapping and symmetry
@@ -126,7 +134,7 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
     // we don't care if things swap; we have symmetry
     return this;
   }
-/**
+  /**
    * Returns the first variable. This is the only mechanism by which subclasses should access
    * variables.
    */
@@ -155,7 +163,7 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
       @Interned Object val1, @Interned Object val2, int mod_index, int count) {
     // Tests for whether a value is missing should be performed before
     // making this call, so as to reduce overall work.
-    assert ! falsified;
+    assert !falsified;
     assert (mod_index >= 0) && (mod_index < 4);
     long v1 = (((Long) val1).longValue());
     long v2 = (((Long) val2).longValue());
@@ -172,8 +180,8 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
         return check_modified(v1, v2, count);
       }
     }
-  } 
-   
+  }
+
   @Pure
   @Override
   public boolean is_symmetric() {
@@ -256,7 +264,7 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
     return format_unimplemented(format);
   }*/
 
- //@Override
+  // @Override
   public InvariantStatus check_modified(long v1, long v2, int count) {
     // @TODO: implement a check that actually makes sense. TBH, since our "variables" are constants,
     //    this could probably be return NO_CHANGE all the time, but think about it harder first.
@@ -266,7 +274,7 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
     return InvariantStatus.NO_CHANGE;
   }
 
-  //@Override
+  // @Override
   public InvariantStatus add_modified(long v1, long v2, int count) {
     if (logDetail() || debug.isLoggable(Level.FINE)) {
       log(
@@ -338,12 +346,12 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
   //   super.destroy();
   // }
 
- @Override
+  @Override
   public InvariantStatus add(
       @Interned Object val1, @Interned Object val2, int mod_index, int count) {
     // Tests for whether a value is missing should be performed before
     // making this call, so as to reduce overall work.
-    assert ! falsified;
+    assert !falsified;
     assert (mod_index >= 0) && (mod_index < 4);
     long v1 = (((Long) val1).longValue());
     long v2 = (((Long) val2).longValue());
@@ -361,7 +369,7 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
       }
     }
   }
- /* @Override
+  /* @Override
   public InvariantStatus add(@Interned Object v1, @Interned Object v2, int mod_index, int count) {
     // @TODO: check out logging for Invariants with computed constants to see how they're logged
     if (debug.isLoggable(Level.FINE)) {
@@ -434,7 +442,7 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
    * avoid circular isObvious relations. We only check if this.ppt.var_infos imply obviousness
    * rather than the cartesian product on the equality set.
    */
- /* @Pure
+  /* @Pure
   @Override
   public @Nullable DiscardInfo isObviousStatically_SomeInEquality() {
     if (var1().equalitySet == var2().equalitySet) {
