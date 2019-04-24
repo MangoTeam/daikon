@@ -1,3 +1,22 @@
+Mango Development Manual
+
+To Test Daikon on Test Data
+java -cp .:$DAIKONDIR/daikon.jar daikon.Chicory --config-dir daikon.settings.txt daikon \
+     --comparability-file=StackArTester.decls-DynComp \
+     DataStructures.StackArTester
+
+javac -g DataStructures/*.java
+java -cp .:$DAIKONDIR/daikon.jar daikon.Chicory DataStructures.StackArTester 
+java -cp .:$DAIKONDIR/daikon.jar daikon.Daikon --config ./daikon-settings.txt StackArTester.dtrace.gz
+
+To Build Daikon
+rebuild daikon.jar: make -C $DAIKONDIR daikon.jar
+> TODO: would be ideal to build only the part of the project we need
+
+When Committing Changes
+- run `make reformat`
+
+
 This is the distribution of the Daikon invariant detector,
 Daikon version 5.7.3, released November 8, 2018.
 
@@ -12,3 +31,4 @@ The documentation also appears on the Daikon homepage:
 If you are working with source cloned from the source code repository
 https://github.com/codespecs/daikon, then please review the file
 README.source.
+
