@@ -47,15 +47,15 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
    */
   /** Returns whether or not the specified types are valid. */
   @Override
-  final public boolean valid_types(VarInfo[] vis) {
-  
-      if (vis.length != 2) {
-        return false;
-      }
-  
-      boolean dim_ok = !vis[0].file_rep_type.isArray() && !vis[1].file_rep_type.isArray();
-  
-      return (dim_ok && vis[0].file_rep_type.baseIsScalar() && vis[1].file_rep_type.baseIsScalar());
+  public final boolean valid_types(VarInfo[] vis) {
+
+    if (vis.length != 2) {
+      return false;
+    }
+
+    boolean dim_ok = !vis[0].file_rep_type.isArray() && !vis[1].file_rep_type.isArray();
+
+    return (dim_ok && vis[0].file_rep_type.baseIsScalar() && vis[1].file_rep_type.baseIsScalar());
   }
 
   @Override
