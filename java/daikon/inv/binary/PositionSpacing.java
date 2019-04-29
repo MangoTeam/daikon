@@ -65,7 +65,8 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
 
   @Override
   protected Invariant resurrect_done(int[] permutation) {
-    throw new UnsupportedOperationException();
+    return this;
+    // throw new UnsupportedOperationException();
   }
 
   // We are Serializable, so we specify a version to allow changes to
