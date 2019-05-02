@@ -51,9 +51,12 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
       return false;
     }
 
+    System.out.println("\n\nPosition Spacing: " + vis[0].type + "\n\n");
+    boolean types_ok =  vis[0].type.toString().startsWith("position-spacing")
+                     && vis[1].type.toString().startsWith("position-spacing");
     boolean dim_ok = !vis[0].file_rep_type.isArray() && !vis[1].file_rep_type.isArray();
 
-    return (dim_ok && vis[0].file_rep_type.baseIsScalar() && vis[1].file_rep_type.baseIsScalar());
+    return (types_ok && dim_ok && vis[0].file_rep_type.baseIsScalar() && vis[1].file_rep_type.baseIsScalar());
   }
 
   @Override
