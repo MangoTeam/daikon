@@ -1,5 +1,7 @@
 package daikon.inv.binary;
 
+import static jdk.nashorn.internal.objects.Global.print;
+
 import daikon.*;
 import daikon.inv.*;
 import daikon.inv.binary.twoScalar.LinearBinaryCore;
@@ -8,8 +10,6 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import typequals.prototype.qual.NonPrototype;
 import typequals.prototype.qual.Prototype;
-
-import static jdk.nashorn.internal.objects.Global.print;
 
 // @TODO:
 //	- address embedded tododos
@@ -31,7 +31,12 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
   // @TODO
   @Override
   public final boolean valid_types(VarInfo[] vis) {
-    print(" POSITION SPACING " + vis[0].file_rep_type + "<- File rep type " + vis[0].comparability + "<- comparability ");
+    print(
+        " POSITION SPACING "
+            + vis[0].file_rep_type
+            + "<- File rep type "
+            + vis[0].comparability
+            + "<- comparability ");
     if (vis.length != 2) {
       return false;
     }
@@ -66,13 +71,15 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
 
   // @TODO
   @Override
-  public InvariantStatus check(@Interned Object val1, @Interned Object val2, int mod_index, int count) {
+  public InvariantStatus check(
+      @Interned Object val1, @Interned Object val2, int mod_index, int count) {
     return null;
   }
 
   // @TODO
   @Override
-  public InvariantStatus add(@Interned Object val1, @Interned Object val2, int mod_index, int count) {
+  public InvariantStatus add(
+      @Interned Object val1, @Interned Object val2, int mod_index, int count) {
     return null;
   }
 
@@ -81,8 +88,7 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
   // @TODO
   /** Returns the prototype invariant for PositionSpacing */
   public static @Prototype PositionSpacing get_proto() {
-    if (proto == null)
-      proto = new PositionSpacing();
+    if (proto == null) proto = new PositionSpacing();
     return (proto);
   }
 
@@ -102,7 +108,12 @@ public final class PositionSpacing extends BinaryInvariant implements EqualityCo
   public String format_using(@GuardSatisfied PositionSpacing this, OutputFormat format) {
     // @TODO: update to actually represent PositionSpacing constraint i.e. x = y + a
     // return core.format_using(format, var1().name_using(format), var2().name_using(format));
-    return var1().name() + " POSITION SPACING " + var1().file_rep_type + "<- File rep type " + var2().comparability + "<- comparability ";
+    return var1().name()
+        + " POSITION SPACING "
+        + var1().file_rep_type
+        + "<- File rep type "
+        + var2().comparability
+        + "<- comparability ";
   }
 
   // @TODO
